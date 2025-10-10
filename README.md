@@ -1,144 +1,76 @@
-Projet d'Analyse de Données Football avec PySpark
-📋 Description du Projet
-Ce projet utilise PySpark pour analyser des données de matches de football allemand (Bundesliga) sur la période 2000-2015. L'analyse comprend le traitement de données, l'agrégation de statistiques d'équipe, le calcul de classements et l'identification des champions par saison.
+# ⚽ Projet d'Analyse de Données Football avec PySpark
 
-🎯 Objectifs
-Nettoyer et transformer les données brutes de matches de football
+## 📋 Description du Projet
+Ce projet utilise **PySpark** pour une analyse approfondie des données de matches de football allemand (**Bundesliga**) sur la période **2000-2015**. L'analyse comprend le traitement de données distribué, l'agrégation de statistiques d'équipe, le calcul de classements complexes par saison et l'identification automatisée des champions.
 
-Calculer des statistiques d'équipe (victoires, défaites, buts marqués/encaissés)
+---
 
-Déterminer le classement des équipes par saison
+## 🎯 Objectifs Clés
+* **Nettoyage & Transformation :** Préparer les données brutes de matches pour l'analyse.
+* **Calcul de Statistiques :** Dériver des métriques d'équipe (victoires, défaites, buts marqués/encaissés).
+* **Classement Dynamique :** Déterminer le classement des équipes par saison en utilisant les **Window Functions** de PySpark.
+* **Identification des Champions :** Extraire les champions de chaque saison avec leurs statistiques détaillées.
+* **Visualisation :** Représenter les performances clés des équipes championnes.
 
-Identifier les champions de chaque saison
+---
 
-Visualiser les performances des équipes championnes
+## 🛠️ Technologies Utilisées
+| Technologie | Rôle |
+| :--- | :--- |
+| **PySpark 3.5.1** | Traitement de données distribué et *Feature Engineering*. |
+| **Python** | Langage de programmation. |
+| **Pandas / Matplotlib** | Analyse de données pour la visualisation (graphiques). |
+| **Jupyter/Colab** | Environnement de développement. |
 
-🛠️ Technologies Utilisées
-PySpark 3.5.1 - Traitement distribué des données
+---
 
-Python - Langage de programmation
+## 📊 Structure des Données
 
-Pandas - Analyse de données pour visualisation
+### Données Source
+Fichier CSV de matches avec les colonnes clés :
+`Season`, `HomeTeam`, `AwayTeam`, `FTHG` (Buts Domicile), `FTAG` (Buts Extérieur), `FTR` (Résultat Final).
 
-Matplotlib - Création de graphiques
+### Données Transformées
+Dataset agrégé par équipe et par saison, incluant :
+`GoalsScored`, `GoalsAgainst`, `GoalDifferentials`, `WinPercentage`, `TeamPosition` (Classement final).
 
-Jupyter/Colab - Environnement de développement
+---
 
-📊 Structure des Données
-Données Source
-Le fichier CSV original contient les colonnes suivantes :
+## 🔄 Processus de Traitement PySpark
+1.  **Chargement & Filtrage :** Lecture du CSV et isolation des données de Bundesliga (Div 1, 2000-2015).
+2.  **Feature Engineering :** Création d'indicatrices de victoire/défaite/nul par match.
+3.  **Agrégation :** Calcul séparé et fusion des statistiques Domicile/Extérieur pour obtenir les statistiques totales d'équipe.
+4.  **Classement :** Utilisation des **Window Functions** pour classer les équipes par saison (Critères : Pourcentage de Victoires puis Différentiel de Buts).
+5.  **Export :** Sauvegarde des résultats au format **Parquet partitionné** par saison.
 
-Match_ID, Div (Division), Season, Date
+---
 
-HomeTeam, AwayTeam (Équipes à domicile et extérieur)
-
-FTHG, FTAG (Buts marqués à domicile et à l'extérieur)
-
-FTR (Résultat final: H=Victoire domicile, A=Victoire extérieur, D=Match nul)
-
-Données Transformées
-Après traitement, le dataset inclut :
-
-Statistiques par équipe et par saison
-
-Pourcentages de victoires/défaites/nuls
-
-Différentiel de buts
-
-Classement final
-
-Métriques de performance
-
-🔄 Processus de Traitement
-1. Chargement et Nettoyage
-Lecture du fichier CSV
-
-Renommage des colonnes pour plus de clarté
-
-Filtrage sur la Division 1 (2000-2015)
-
-2. Feature Engineering
-Création de colonnes supplémentaires :
-
-HomeTeamWin / AwayTeamWin / GameTie (indicatrices binaires)
-
-Agrégation des statistiques par équipe et saison
-
-3. Agrégation et Jointure
-Calcul des statistiques à domicile et à l'extérieur
-
-Fusion des DataFrames home/away
-
-Création de métriques synthétiques :
-
-GoalsScored, GoalsAgainst
-
-WinPercentage, GoalDifferentials
-
-GoalsPerGame, GoalsAgainstPerGame
-
-4. Classement
-Utilisation des Window Functions pour :
-
-Classer les équipes par saison
-
-Priorité : Pourcentage de victoires → Différentiel de buts
-
-5. Export et Visualisation
-Sauvegarde en format Parquet partitionné
-
-Génération de graphiques pour les équipes championnes
-
-📈 Métriques Calculées
+## 📈 Métriques Clés Calculées
 Pour chaque équipe et saison :
 
-Statistiques de base : Victoires, Défaites, Nuls
+* **Statistiques de base :** Victoires, Défaites, Nuls.
+* **Performance :** Buts marqués, Buts encaissés, **Différentiel de buts**.
+* **Efficacité :** **Pourcentage de victoires**.
+* **Résultat :** **Position finale** dans la ligue (`TeamPosition`).
 
-Performance offensive : Buts marqués, Buts par match
+---
 
-Performance défensive : Buts encaissés, Buts contre par match
+## 🚀 Utilisation et Exemple
+Pour interroger les données traitées directement avec PySpark :
 
-Efficacité : Pourcentage de victoires, Différentiel de buts
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
 
-Classement : Position finale dans la ligue
+# Supposons que 'spark' est initialisé
+# df_ranked = spark.read.parquet("football_stats_partitioned")
 
-🏆 Résultats Principaux
-Le projet identifie automatiquement les champions de Bundesliga pour chaque saison entre 2000 et 2015, avec leurs statistiques détaillées.
-
-📁 Structure des Fichiers de Sortie
-football_stats_partitioned/ - Dataset complet partitionné par saison
-
-football_top_teams/ - Statistiques des équipes championnes
-
-🚀 Utilisation
-python
-# Charger les données traitées
-df_ranked = spark.read.parquet("football_stats_partitioned")
+# Charger les données des champions
 df_champions = spark.read.parquet("football_top_teams")
 
-# Afficher le classement d'une saison spécifique
-df_ranked.filter(F.col("Season") == 2010).orderBy("TeamPosition").show()
-📊 Visualisations Disponibles
-Pourcentage de victoires des champions - Évolution de la dominance
+# Afficher le classement d'une saison spécifique (exemple 2010)
+# Assurez-vous d'avoir le chemin correct vers le fichier parquet partitionné
+# df_ranked.filter(F.col("Season") == 2010).orderBy("TeamPosition").show(truncate=False)
 
-Buts marqués par les champions - Performance offensive
-
-Différentiel de buts - Mesure de la supériorité globale
-
-🔍 Insights Potentiels
-Ce dataset permet d'analyser :
-
-L'évolution de la compétitivité de la ligue
-
-Les caractéristiques des équipes championnes
-
-Les tendances offensives/défensives au fil du temps
-
-La performance relative des équipes à domicile vs extérieur
-
-📝 Notes
-Les données couvrent 16 saisons de Bundesliga
-
-Toutes les équipes sont analysées sur la même base (34 matches/saison)
-
-Le classement utilise des critères standard (points → différentiel de buts)
+print("--- Aperçu des Champions ---")
+df_champions.show(5)
